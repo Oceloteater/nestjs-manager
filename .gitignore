@@ -1,4 +1,4 @@
-# compiled output
+# Compiled output
 /dist
 /node_modules
 
@@ -36,3 +36,4 @@ lerna-debug.log*
 
 # Config
 config.js
+.env
