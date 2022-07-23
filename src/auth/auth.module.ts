@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,16 +9,19 @@ import { UsersRepository } from './users.repository';
 import { JwtStrategy } from './jwt.strategy';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config();
-
-console.log('secret:', process.env.SECRET);
+require('dotenv').config(); // needed for process.env.SECRET before
 
 @Module({
   imports: [
+    ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.SECRET,
-      signOptions: { expiresIn: 3600 },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('SECRET'),
+        signOptions: { expiresIn: 3600 },
+      }),
     }),
     TypeOrmModule.forFeature([UsersRepository]),
   ],
